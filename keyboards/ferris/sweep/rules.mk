@@ -1,1 +1,9 @@
 # This file intentionally left blank
+LTO_ENABLE = yes
+CONSOLE_ENABLE = no
+COMMAND_ENABLE = no
+MOUSEKEY_ENABLE = no
+DYNAMIC_MACRO_ENABLE = no
+TAP_DANCE_ENABLE = yes
+SPACE_CADET_ENABLE = no
+RGBLIGHT_ENABLE = no
