@@ -8,9 +8,7 @@
     },
     "development_board": "promicro",
     "features": {
-        "bootmagic": false,
-        "extrakey": true,
-        "unicode": true
+        "bootmagic": false
     },
     "matrix_pins": {
         "direct": [

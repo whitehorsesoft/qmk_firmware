@@ -2,7 +2,12 @@
 
 // Tap Dance declarations - ref
 enum {
-    TD_ESC
+    TD_ESC,
+    TD_HOME,
+    TD_END,
+    TD_ZERO,
+    SS_GG = SAFE_RANGE,
+    SS_00
 };
 
 typedef struct {
@@ -15,12 +20,42 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     tap_dance_action_t *action;
 
     switch (keycode) {
-        case TD(TD_ESC):  // list all tap dance keycodes with tap-hold configurations
+        case SS_GG:
+            if (record->event.pressed) {
+                SEND_STRING("gg");
+            } else {
+                // when released
+            }
+            return true;
+            break;
+        case SS_00:
+            if (record->event.pressed) {
+                SEND_STRING(SS_TAP(X_0) SS_TAP(X_0));
+            } else {
+                // when released
+            }
+            return true;
+            break;
+        case TD(TD_ESC):
+        case TD(TD_HOME):
+        case TD(TD_END):
             action = &tap_dance_actions[TD_INDEX(keycode)];
             if (!record->event.pressed && action->state.count && !action->state.finished) {
                 tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)action->user_data;
                 tap_code16(tap_hold->tap);
             }
+            return true;
+            break;
+        case TD(TD_ZERO):
+            action = &tap_dance_actions[TD_INDEX(keycode)];
+            if (!record->event.pressed && action->state.count && !action->state.finished) {
+                tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)action->user_data;
+                tap_code16(tap_hold->tap);
+            }
+            return true;
+            break;
+        default:
+            break;
     }
     return true;
 }
@@ -56,48 +91,57 @@ void tap_dance_tap_hold_reset(tap_dance_state_t *state, void *user_data) {
     { .fn = {NULL, tap_dance_tap_hold_finished, tap_dance_tap_hold_reset}, .user_data = (void *)&((tap_dance_tap_hold_t){tap, hold, 0}), }
 
 tap_dance_action_t tap_dance_actions[] = {
-    // h on top, esc on hold
-    [TD_ESC] = ACTION_TAP_DANCE_TAP_HOLD(S(KC_H), KC_ESC)
+    // h on tap, esc on hold
+    [TD_ESC] = ACTION_TAP_DANCE_TAP_HOLD(SFT_T(KC_H), KC_ESC),
+    // home on tap, ctrl+home on hold
+    [TD_HOME] = ACTION_TAP_DANCE_TAP_HOLD(KC_HOME, C(KC_HOME)),
+    // end on tap, ctrl+end on hold
+    [TD_END] = ACTION_TAP_DANCE_TAP_HOLD(KC_END, C(KC_END)),
+    // 0 on tap, 00 on hold
+    [TD_ZERO] = ACTION_TAP_DANCE_TAP_HOLD(KC_0, SS_00),
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+    // base
 	[0] = LAYOUT_split_3x5_2(
         KC_QUOTE, KC_COMMA, KC_DOT, KC_P, KC_Y,
             KC_F, KC_G, KC_C, KC_R, KC_L,
 
-        KC_A, A(KC_O), C(KC_E), S(KC_U), KC_I,
-            KC_D, TD(TD_ESC), C(KC_T), A(KC_N), KC_S,
+        KC_A, ALT_T(KC_O), CTL_T(KC_E), SFT_T(KC_U), KC_I,
+            KC_D, TD(TD_ESC), CTL_T(KC_T), ALT_T(KC_N), KC_S,
 
-        KC_SEMICOLON, KC_Q, KC_J, LT(2,KC_K), LT(1,KC_X),
+        KC_SEMICOLON, KC_Q, LT(2,KC_J), LT(1,KC_K), KC_X,
             KC_B, KC_M, KC_W, KC_V, KC_Z,
 
-        KC_TAB, KC_ENTER,
-            KC_SPACE, KC_BACKSPACE
+        KC_ENTER , KC_TAB,
+            KC_BACKSPACE , KC_SPACE
         ),
+    // nav
 	[1] = LAYOUT_split_3x5_2(
         KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
-            KC_TRANSPARENT, KC_HOME, KC_UP, KC_END, KC_TRANSPARENT,
+            KC_TRANSPARENT , TD(TD_HOME), KC_UP, TD(TD_END), KC_TRANSPARENT,
 
         KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
-            KC_TRANSPARENT, KC_LEFT, KC_DOWN, KC_RIGHT, KC_TRANSPARENT,
+            S(KC_I), KC_LEFT, KC_DOWN, KC_RIGHT, S(KC_A),
 
         KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
-            KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+            S(KC_5), KC_B, KC_W, KC_TRANSPARENT, KC_TRANSPARENT,
 
         KC_TRANSPARENT, KC_TRANSPARENT,
             KC_TRANSPARENT, KC_TRANSPARENT
         ),
+    // num
 	[2] = LAYOUT_split_3x5_2(
         KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
             KC_TRANSPARENT, KC_7, KC_8, KC_9, KC_TRANSPARENT,
 
         KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
-            KC_TRANSPARENT, KC_4, KC_5, KC_6, KC_TRANSPARENT,
+            SS_GG, KC_4, KC_5, KC_6, KC_TRANSPARENT,
 
         KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
             KC_TRANSPARENT, KC_1, KC_2, KC_3, KC_TRANSPARENT,
 
         KC_TRANSPARENT, KC_TRANSPARENT,
-            KC_TRANSPARENT, KC_0
+            KC_DOT, TD(TD_ZERO)
         )
 };
