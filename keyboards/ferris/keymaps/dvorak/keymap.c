@@ -33,7 +33,7 @@ typedef struct {
     uint16_t held;
 } tap_dance_tap_hold_t;
 
-void process_keypress(uint16_t keycode) {
+uint16_t process_keypress(uint16_t keycode) {
     if (get_mods() == MOD_MASK_SHIFT) {
         keycode = S(keycode);
     }
@@ -46,28 +46,29 @@ void process_keypress(uint16_t keycode) {
         keycode = C(keycode);
     }
 
-    tap_code16(keycode);
+    return keycode;
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    bool matches_custom = false;
+    bool matched_possibility = false;
     // check possibilities
     for (int i = 0; i < 4; i++) {
         if (possibilities[i].main_keycode == keycode) {
             if (record->event.pressed) {
                 // pressed
                 aaron_indicator = record->event.time;
+                return false;
             } else {
                 // released
                 uint16_t now_time = record->event.time;
                 if ((now_time - aaron_indicator) < 200) {
-                    process_keypress(possibilities[i].main_keycode);
+                    keycode = process_keypress(possibilities[i].main_keycode);
                 } else {
-                    process_keypress(possibilities[i].hold_keycode);
+                    keycode = process_keypress(possibilities[i].hold_keycode);
                 }
-            }
 
-            matches_custom = true;
+                matched_possibility = true;
+            }
         }
     }
 
@@ -77,16 +78,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case SS_GG:
             if (record->event.pressed) {
                 SEND_STRING("gg");
-            } else {
-                // when released
             }
+            return false;
             break;
         case SS_00:
-            if (record->event.pressed) {
-                SEND_STRING(SS_TAP(X_0) SS_TAP(X_0));
-            } else {
-                // when released
+            if (!record->event.pressed) {
+                SEND_STRING("00");
             }
+            return false;
             break;
         case TD(TD_HOME):
         case TD(TD_END):
@@ -95,11 +94,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)action->user_data;
                 tap_code16(tap_hold->tap);
             }
+
             break;
         default:
+            if (matched_possibility) {
+                tap_code16(keycode);
+                return false;
+            }
+
             break;
     }
-    return !matches_custom;
+
+    return true;
 }
 
 void tap_dance_tap_hold_finished(tap_dance_state_t *state, void *user_data) {
