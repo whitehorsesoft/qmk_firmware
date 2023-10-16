@@ -17,7 +17,10 @@ enum custom_keycodes {
     // first keycode should always be set to SAFE_RANGE (ref https://docs.qmk.fm/#/custom_quantum_functions?id=defining-a-new-keycode)
     SS_GG = SAFE_RANGE,
     SS_00,
-    SS_APPEND_SEMI
+    SS_APPEND_SEMI,
+    SS_RDARW,
+    SS_LDARW,
+    SS_RSARW,
 };
 
 struct possibility {
@@ -26,7 +29,6 @@ struct possibility {
 };
 
 struct possibility possibilities[] = {
-    { .main_keycode = KC_QUOTE, .hold_keycode = TG(4) },
     { .main_keycode = KC_COMMA, .hold_keycode = S(KC_SLASH) },
     { .main_keycode = KC_DOT, .hold_keycode = KC_SEMICOLON },
     { .main_keycode = KC_P, .hold_keycode = S(KC_QUOTE) },
@@ -38,7 +40,6 @@ struct possibility possibilities[] = {
     { .main_keycode = KC_C, .hold_keycode = KC_MINUS },
     { .main_keycode = KC_R, .hold_keycode = KC_BACKSLASH },
     { .main_keycode = KC_S, .hold_keycode = S(KC_2) },
-    { .main_keycode = KC_GRAVE, .hold_keycode = KC_LGUI },
     { .main_keycode = KC_M, .hold_keycode = KC_SLASH },
     { .main_keycode = KC_W, .hold_keycode = S(KC_SEMICOLON) },
     { .main_keycode = KC_V, .hold_keycode = S(KC_GRAVE) },
@@ -69,7 +70,7 @@ uint16_t process_keypress(uint16_t keycode) {
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     bool matched_possibility = false;
     // check possibilities
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 14; i++) {
         if (possibilities[i].main_keycode == keycode) {
             if (record->event.pressed) {
                 // pressed
@@ -107,7 +108,25 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             break;
         case SS_APPEND_SEMI:
             if (record->event.pressed) {
-                SEND_STRING_DELAY("A;", 100);
+                SEND_STRING_DELAY(SS_TAP(X_ESC) "A;" SS_TAP(X_ESC), 100);
+            }
+            return true;
+            break;
+        case SS_RDARW:
+            if (record->event.pressed) {
+                SEND_STRING_DELAY("=>", 100);
+            }
+            return true;
+            break;
+        case SS_LDARW:
+            if (record->event.pressed) {
+                SEND_STRING_DELAY("<=", 100);
+            }
+            return true;
+            break;
+        case SS_RSARW:
+            if (record->event.pressed) {
+                SEND_STRING_DELAY("->", 100);
             }
             return true;
             break;
@@ -173,13 +192,13 @@ tap_dance_action_t tap_dance_actions[] = {
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // base
 	[0] = LAYOUT_split_3x5_2(
-        KC_QUOTE, KC_COMMA, KC_DOT, KC_P, KC_Y,
+        LT(4,KC_QUOTE), KC_COMMA, KC_DOT, KC_P, KC_Y,
             KC_F, KC_G, KC_C, KC_R, KC_L,
 
         KC_A, ALT_T(KC_O), CTL_T(KC_E), SFT_T(KC_U), KC_I,
             KC_D, SFT_T(KC_H), CTL_T(KC_T), ALT_T(KC_N), KC_S,
 
-        KC_GRAVE, KC_Q, LT(2,KC_J), LT(1,KC_K), KC_X,
+        MT(MOD_LGUI, KC_GRAVE), KC_Q, LT(2,KC_J), LT(1,KC_K), KC_X,
             LT(3, KC_B), KC_M, KC_W, KC_V, KC_Z,
 
         KC_TAB, KC_ENTER ,
@@ -202,26 +221,26 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // num
 	[2] = LAYOUT_split_3x5_2(
         KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
-            KC_TRANSPARENT, KC_7, KC_8, KC_9, KC_TRANSPARENT,
+            S(KC_EQUAL), KC_7, KC_8, KC_9, KC_TRANSPARENT,
 
         KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
-            SS_GG, KC_4, KC_5, KC_6, KC_TRANSPARENT,
+            KC_MINUS, KC_4, KC_5, KC_6, KC_TRANSPARENT,
 
         KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
-            KC_TRANSPARENT, KC_1, KC_2, KC_3, KC_TRANSPARENT,
+            SS_GG, KC_1, KC_2, KC_3, KC_TRANSPARENT,
 
         KC_TRANSPARENT, KC_TRANSPARENT,
             KC_DOT, KC_0
         ),
     // sym
     [3] = LAYOUT_split_3x5_2(
-        KC_TRANSPARENT, KC_TRANSPARENT, S(KC_9), S(KC_0), KC_TRANSPARENT,
+        KC_TRANSPARENT, SS_RSARW, S(KC_9), S(KC_0), KC_TRANSPARENT,
             KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
 
         KC_LEFT_BRACKET, KC_RIGHT_BRACKET, S(KC_LEFT_BRACKET), S(KC_RIGHT_BRACKET), SS_APPEND_SEMI,
             KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
 
-        KC_TRANSPARENT, KC_TRANSPARENT, S(KC_COMMA), S(KC_DOT), KC_TRANSPARENT,
+        SS_LDARW, SS_RDARW, S(KC_COMMA), S(KC_DOT), KC_TRANSPARENT,
             KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
 
         KC_TRANSPARENT, KC_TRANSPARENT,
