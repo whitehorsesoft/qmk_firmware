@@ -1,10 +1,14 @@
 #include QMK_KEYBOARD_H
-extern uint16_t aaron_indicator;
-uint16_t aaron_indicator;
+
+struct prev_keypress_struct {
+    uint16_t keycode;
+    uint16_t pressed_time;
+};
+
+struct prev_keypress_struct prev_keypress;
 
 // Tap Dance declarations - ref
 enum tapdances {
-    TD_ESC,
     TD_HOME,
     TD_END
 };
@@ -13,6 +17,7 @@ enum custom_keycodes {
     // first keycode should always be set to SAFE_RANGE (ref https://docs.qmk.fm/#/custom_quantum_functions?id=defining-a-new-keycode)
     SS_GG = SAFE_RANGE,
     SS_00,
+    SS_APPEND_SEMI
 };
 
 struct possibility {
@@ -20,11 +25,23 @@ struct possibility {
     uint16_t hold_keycode;
 };
 
-struct possibility possibilities[4] = {
-    {KC_COMMA, S(KC_SLASH)},
-    {KC_DOT, KC_SEMICOLON},
-    {KC_P, S(KC_QUOTE)},
-    {KC_0, SS_00}
+struct possibility possibilities[] = {
+    { .main_keycode = KC_QUOTE, .hold_keycode = TG(4) },
+    { .main_keycode = KC_COMMA, .hold_keycode = S(KC_SLASH) },
+    { .main_keycode = KC_DOT, .hold_keycode = KC_SEMICOLON },
+    { .main_keycode = KC_P, .hold_keycode = S(KC_QUOTE) },
+    { .main_keycode = KC_A, .hold_keycode = KC_CAPS },
+    { .main_keycode = KC_0, .hold_keycode = SS_00 },
+    { .main_keycode = KC_I, .hold_keycode = KC_ESC },
+    { .main_keycode = KC_H, .hold_keycode = KC_ESC },
+    { .main_keycode = KC_G, .hold_keycode = KC_EQUAL },
+    { .main_keycode = KC_C, .hold_keycode = KC_MINUS },
+    { .main_keycode = KC_R, .hold_keycode = KC_BACKSLASH },
+    { .main_keycode = KC_S, .hold_keycode = S(KC_2) },
+    { .main_keycode = KC_GRAVE, .hold_keycode = KC_LGUI },
+    { .main_keycode = KC_M, .hold_keycode = KC_SLASH },
+    { .main_keycode = KC_W, .hold_keycode = S(KC_SEMICOLON) },
+    { .main_keycode = KC_V, .hold_keycode = S(KC_GRAVE) },
 };
 
 typedef struct {
@@ -52,16 +69,17 @@ uint16_t process_keypress(uint16_t keycode) {
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     bool matched_possibility = false;
     // check possibilities
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 16; i++) {
         if (possibilities[i].main_keycode == keycode) {
             if (record->event.pressed) {
                 // pressed
-                aaron_indicator = record->event.time;
+                prev_keypress.keycode = keycode;
+                prev_keypress.pressed_time = record->event.time;
                 return false;
             } else {
                 // released
                 uint16_t now_time = record->event.time;
-                if ((now_time - aaron_indicator) < 200) {
+                if ((now_time - prev_keypress.pressed_time) < 200) {
                     keycode = process_keypress(possibilities[i].main_keycode);
                 } else {
                     keycode = process_keypress(possibilities[i].hold_keycode);
@@ -87,6 +105,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
             break;
+        case SS_APPEND_SEMI:
+            if (record->event.pressed) {
+                SEND_STRING_DELAY("A;", 100);
+            }
+            return true;
+            break;
+        // tap dance hold
         case TD(TD_HOME):
         case TD(TD_END):
             action = &tap_dance_actions[TD_INDEX(keycode)];
@@ -142,7 +167,7 @@ tap_dance_action_t tap_dance_actions[] = {
     // home on tap, ctrl+home on hold
     [TD_HOME] = ACTION_TAP_DANCE_TAP_HOLD(KC_HOME, C(KC_HOME)),
     // end on tap, ctrl+end on hold
-    [TD_END] = ACTION_TAP_DANCE_TAP_HOLD(KC_END, C(KC_END)),
+    [TD_END] = ACTION_TAP_DANCE_TAP_HOLD(KC_END, C(KC_END))
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -155,7 +180,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
             KC_D, SFT_T(KC_H), CTL_T(KC_T), ALT_T(KC_N), KC_S,
 
         KC_GRAVE, KC_Q, LT(2,KC_J), LT(1,KC_K), KC_X,
-            KC_B, KC_M, KC_W, KC_V, KC_Z,
+            KC_B, LT(3,KC_M), KC_W, KC_V, KC_Z,
 
         KC_ENTER , KC_TAB,
             KC_BACKSPACE , KC_SPACE
@@ -187,5 +212,33 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
         KC_TRANSPARENT, KC_TRANSPARENT,
             KC_DOT, KC_0
+        ),
+    // sym
+    [3] = LAYOUT_split_3x5_2(
+        KC_TRANSPARENT, KC_TRANSPARENT, S(KC_9), S(KC_0), KC_TRANSPARENT,
+            KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+
+        KC_LEFT_BRACKET, KC_RIGHT_BRACKET, S(KC_LEFT_BRACKET), S(KC_RIGHT_BRACKET), SS_APPEND_SEMI,
+            KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+
+        KC_TRANSPARENT, KC_TRANSPARENT, S(KC_COMMA), S(KC_DOT), KC_TRANSPARENT,
+            KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+
+        KC_TRANSPARENT, KC_TRANSPARENT,
+            KC_TRANSPARENT, KC_TRANSPARENT
+        ),
+    // clipboard
+    [4] = LAYOUT_split_3x5_2(
+        KC_TRANSPARENT, C(KC_A), C(KC_C), C(KC_V), KC_TRANSPARENT,
+            KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+
+        KC_TRANSPARENT, KC_TRANSPARENT, C(S(KC_C)), C(S(KC_V)), KC_TRANSPARENT,
+            KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+
+        KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+            KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+
+        KC_TRANSPARENT, KC_TRANSPARENT,
+            KC_TRANSPARENT, KC_TRANSPARENT
         )
 };
