@@ -50,6 +50,7 @@ void process_keypress(uint16_t keycode) {
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    bool matches_custom = false;
     // check possibilities
     for (int i = 0; i < 4; i++) {
         if (possibilities[i].main_keycode == keycode) {
@@ -66,7 +67,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
             }
 
-            return false;
+            matches_custom = true;
         }
     }
 
@@ -98,7 +99,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         default:
             break;
     }
-    return true;
+    return !matches_custom;
 }
 
 void tap_dance_tap_hold_finished(tap_dance_state_t *state, void *user_data) {
