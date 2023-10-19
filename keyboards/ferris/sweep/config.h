@@ -7,3 +7,4 @@
 #pragma once
 
 #define EE_HANDS
+#define DEBOUNCE 20

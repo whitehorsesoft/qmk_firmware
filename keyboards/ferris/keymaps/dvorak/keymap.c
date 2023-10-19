@@ -32,10 +32,10 @@ struct possibility possibilities[] = {
     { .main_keycode = KC_COMMA, .hold_keycode = S(KC_SLASH) },
     { .main_keycode = KC_DOT, .hold_keycode = KC_SEMICOLON },
     { .main_keycode = KC_P, .hold_keycode = S(KC_QUOTE) },
+    { .main_keycode = KC_F, .hold_keycode = KC_ESC },
+    { .main_keycode = KC_Y, .hold_keycode = KC_ESC },
     { .main_keycode = KC_A, .hold_keycode = KC_CAPS },
     { .main_keycode = KC_0, .hold_keycode = SS_00 },
-    { .main_keycode = KC_I, .hold_keycode = KC_ESC },
-    { .main_keycode = KC_D, .hold_keycode = KC_ESC },
     { .main_keycode = KC_G, .hold_keycode = KC_EQUAL },
     { .main_keycode = KC_C, .hold_keycode = KC_MINUS },
     { .main_keycode = KC_R, .hold_keycode = KC_BACKSLASH },
@@ -80,7 +80,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } else {
                 // released
                 uint16_t now_time = record->event.time;
-                if ((now_time - prev_keypress.pressed_time) < 200) {
+                if ((now_time - prev_keypress.pressed_time) < 300) {
                     keycode = process_keypress(possibilities[i].main_keycode);
                 } else {
                     keycode = process_keypress(possibilities[i].hold_keycode);
@@ -195,11 +195,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         LT(4,KC_QUOTE), KC_COMMA, KC_DOT, KC_P, KC_Y,
             KC_F, KC_G, KC_C, KC_R, KC_L,
 
-        KC_A, ALT_T(KC_O), CTL_T(KC_E), SFT_T(KC_U), KC_I,
-            KC_D, SFT_T(KC_H), CTL_T(KC_T), ALT_T(KC_N), KC_S,
+        KC_A, ALT_T(KC_O), CTL_T(KC_E), SFT_T(KC_U), LT(3, KC_I),
+            LT(3, KC_D), SFT_T(KC_H), CTL_T(KC_T), ALT_T(KC_N), KC_S,
 
         MT(MOD_LGUI, KC_GRAVE), LT(5,KC_Q), LT(2,KC_J), LT(1,KC_K), KC_X,
-            LT(3, KC_B), KC_M, KC_W, KC_V, KC_Z,
+            KC_B, KC_M, KC_W, KC_V, KC_Z,
 
         KC_TAB, KC_ENTER ,
         KC_SPACE , KC_BACKSPACE
