@@ -21,6 +21,7 @@ enum custom_keycodes {
     SS_RDARW,
     SS_LDARW,
     SS_RSARW,
+    SS_APPEND,
 };
 
 struct possibility {
@@ -130,6 +131,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return true;
             break;
+        case SS_APPEND:
+            if (record->event.pressed) {
+                SEND_STRING_DELAY(SS_TAP(X_ESC) "A", 100);
+            }
+            return true;
+            break;
         // tap dance hold
         case TD(TD_HOME):
         case TD(TD_END):
@@ -210,7 +217,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
             KC_TRANSPARENT , TD(TD_HOME), KC_UP, TD(TD_END), KC_TRANSPARENT,
 
         KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
-            S(KC_I), KC_LEFT, KC_DOWN, KC_RIGHT, S(KC_A),
+            S(KC_I), KC_LEFT, KC_DOWN, KC_RIGHT, SS_APPEND,
 
         KC_TRANSPARENT, KC_LSFT, KC_LCTL, KC_TRANSPARENT, KC_TRANSPARENT,
             S(KC_5), KC_B, KC_W, KC_TRANSPARENT, KC_TRANSPARENT,
