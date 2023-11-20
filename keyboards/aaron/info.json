@@ -14,7 +14,8 @@
         "console": false,
         "extrakey": false,
         "mousekey": false,
-        "nkro": true
+        "nkro": true,
+        "rgb_matrix": true
     },
     "tapping": {
         "permissive_hold": true
@@ -1059,5 +1060,9 @@
             "splash": true,
             "typing_heatmap": true
         }
+    },
+    "ws2812": {
+        "pin": "GP15",
+        "driver": "vendor"
     }
 }
