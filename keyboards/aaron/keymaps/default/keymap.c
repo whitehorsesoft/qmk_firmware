@@ -5,10 +5,17 @@
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT_manuform(
-        KC_B,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                                KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSLS,
-        KC_LCTL, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                                KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,
-        KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                                KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
-        KC_UP,   KC_DOWN, KC_LGUI,   KC_LALT,   KC_LGUI, KC_ENT, KC_DEL,           KC_BSPC,  KC_SPC,  KC_B, KC_LBRC,  KC_RBRC, KC_LEFT, KC_RIGHT,
+        KC_NO, KC_QUOTE, KC_COMMA, KC_DOT, KC_P, KC_Y,                                KC_F,    KC_G,    KC_C,    KC_R,    KC_L,    KC_NO,
+        KC_CAPS_LOCK, KC_A,   ALT_T(KC_O),  CTL_T(KC_E),  SFT_T(KC_U),   LT(4, KC_I),                                LT(4, KC_D), SFT_T(KC_H), CTL_T(KC_T), ALT_T(KC_N), KC_S, KC_NO,
+        KC_NO, KC_GRAVE,    LT(3, KC_Q),  LT(2, KC_J), LT(1, KC_K), KC_X                                KC_B,    KC_M,    KC_W, KC_V,  KC_Z, KC_NO,
+        LGUI(KC_DOWN), LGUI(KC_UP), LGUI(KC_TAB), KC_ENT, KC_TAB, KC_DEL,           KC_BSPC,  KC_SPC,  KC_B, KC_LBRC,  KC_RBRC, KC_LEFT, KC_RIGHT,
         KC_HOME, KC_END,    KC_ESC,           KC_GRAVE,  KC_CAPS,  KC_APP
         )
+//[0] = LAYOUT_manuform(
+//    KC_NO, KC_QUOTE, KC_COMMA, KC_DOT, KC_P, KC_Y,                                KC_F,    KC_G,    KC_C,    KC_R,    KC_L,    KC_NO,
+//    KC_CAPS_LOCK, KC_A,   KC_O,  KC_E,  KC_U,   KC_I,                                KC_D, KC_H, KC_T, KC_N, KC_S, KC_NO,
+//    KC_NO, KC_GRAVE,    KC_Q,  KC_J, KC_K, KC_X,                                KC_B,    KC_M,    KC_W, KC_V,  KC_Z, KC_NO,
+//        KC_A, KC_B, KC_C, KC_D, KC_E, KC_F, KC_G,                                KC_H, KC_I, KC_J, KC_K, KC_L, KC_M, KC_N,
+//        KC_O, KC_P, KC_Q,                                                        KC_R, KC_S, KC_T
+//)
 };
