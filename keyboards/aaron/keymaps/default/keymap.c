@@ -20,7 +20,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // row 4 & some of thumb
         LGUI(KC_DOWN), LGUI(KC_UP), LGUI(KC_TAB), KC_LGUI, KC_ENT, KC_TAB, LCTL(KC_A), /**/ LCTL(KC_BSPC), KC_BSPC, KC_SPC, KC_NO, KC_NO, KC_NO, RGB_TOG,
         // remainder of thumb
-        LCTL(KC_C), LCS(KC_C), KC_NO, /**/ KC_DEL, LCS(KC_V), LCTL(KC_V)),
+        LCTL(KC_C), LCTL(LSFT(KC_C)), KC_NO, /**/ KC_DEL, LCTL(LSFT(KC_V)), LCTL(KC_V)),
 
     // nav
     [1] = LAYOUT_manuform(
@@ -85,7 +85,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //        // row 4 & some of thumb
 //        KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, /**/ KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
 //        // remainder of thumb
-//        KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, /**/ KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT),
+//        KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, /**/ KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT)
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
