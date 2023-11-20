@@ -2,6 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/chibios" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/lib/chibios-contrib" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/lib/chibios-contrib/ext/mcux-sdk" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/lib/googletest" vcs="Git" />
