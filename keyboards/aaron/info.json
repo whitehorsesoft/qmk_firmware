@@ -4,17 +4,25 @@
     "maintainer": "aaron",
     "bootloader": "rp2040",
     "diode_direction": "ROW2COL",
+    "build": {
+        "debounce_type": "sym_eager_pk",
+        "lto": true
+    },
     "features": {
-        "bootmagic": true,
+        "bootmagic": false,
         "command": false,
         "console": false,
         "extrakey": false,
         "mousekey": false,
         "nkro": true
     },
+    "tapping": {
+        "permissive_hold": true
+    },
     "split": {
         "enabled": true
     },
+    "debounce": 20,
     "matrix_pins": {
         "rows": [
             "GP2",
@@ -499,7 +507,7 @@
     },
     "rgb_matrix": {
         "driver": "ws2812",
-        "max_brightness": 120,
+        "max_brightness": 255,
         "split_count": [
             28,
             28

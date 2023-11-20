@@ -1,1 +1,2 @@
-# This file intentionally left blank
+# could this be used as "driver" in info.json?
+SERIAL_DRIVER = vendor
