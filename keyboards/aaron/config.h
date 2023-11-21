@@ -2,22 +2,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #pragma once
-
-/*
- * Feature disable options
- *  These options are also useful to firmware size reduction.
- */
-
-/* disable debug print */
-//#define NO_DEBUG
-
-/* disable print */
-//#define NO_PRINT
-
-/* disable action features */
-//#define NO_ACTION_LAYER
-//#define NO_ACTION_TAPPING
-//#define NO_ACTION_ONESHOT
 /* Split keyboard settings */
 #define SERIAL_USART_TX_PIN GP28
 #define SPLIT_HAND_PIN GP0
@@ -26,15 +10,12 @@
 #ifdef RGB_MATRIX_ENABLE
 #    define WS2812_PIO_USE_PIO1 // Force the usage of PIO1 peripheral, by default the WS2812 implementation uses the PIO0 peripheral
 #    define SPLIT_TRANSPORT_MIRROR
-//#define ENABLE_RGB_MATRIX_SOLID_REACTIVE
-//#    define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_SOLID_REACTIVE // Sets the default mode, if none has been set
-//#    define RGB_MATRIX_DEFAULT_HUE 240 // Sets the default hue value, if none has been set
-//#    define RGB_MATRIX_DEFAULT_SAT 128 // Sets the default saturation value, if none has been set
-//#    define RGB_MATRIX_DEFAULT_SPD 50
-//#    define RGB_MATRIX_DEFAULT_VAL 128
-//#    define RGB_DISABLE_WHEN_USB_SUSPENDED
-//#    define RGB_MATRIX_KEYPRESSES
-//#    define RGB_MATRIX_FRAMEBUFFER_EFFECTS
+#define SPLIT_LAYER_STATE_ENABLE
+#define SPLIT_LED_STATE_ENABLE
+#    define RGB_DISABLE_WHEN_USB_SUSPENDED
+#define RGB_MATRIX_MAXIMUM_BRIGHTNESS 255
+#define RGB_MATRIX_DEFAULT_VAL RGB_MATRIX_MAXIMUM_BRIGHTNESS
+#define RGB_MATRIX_LED_FLUSH_LIMIT 40 // limits in milliseconds how frequently an animation will update the LEDs. 16 (16ms) is equivalent to limiting to 60fps (increases keyboard responsiveness)
 #endif
 
 /* Double-tap reset button parameters */

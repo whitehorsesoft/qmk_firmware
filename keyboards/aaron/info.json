@@ -508,7 +508,6 @@
     },
     "rgb_matrix": {
         "driver": "ws2812",
-        "max_brightness": 150,
         "split_count": [
             28,
             28

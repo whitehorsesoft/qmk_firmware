@@ -112,13 +112,44 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     if (host_keyboard_led_state().caps_lock) {
-                rgb_matrix_set_color(led_min, RGB_RED);
+        // can't do this, because need to set the color back when done
+//        rgb_matrix_sethsv_noeeprom(0, 250, 128);
+
+        HSV red_hsv = {0, 255, 128}; // ref color.h
+        RGB red_subdued_rgb = hsv_to_rgb(red_hsv);
+
+        rgb_matrix_set_color_all(
+                red_subdued_rgb.r,
+                red_subdued_rgb.g,
+                red_subdued_rgb.b
+                );
+//                rgb_matrix_set_color(0, RGB_RED);
+//                rgb_matrix_set_color(1, RGB_GREEN);
+//        rgb_matrix_set_color(2, RGB_BLUE);
     }
+
+    if (get_highest_layer(layer_state) > 0) {
+        uint8_t layer = get_highest_layer(layer_state);
+
+        for (uint8_t row = 0; row < MATRIX_ROWS; ++row) {
+            for (uint8_t col = 0; col < MATRIX_COLS; ++col) {
+                uint8_t index = g_led_config.matrix_co[row][col];
+
+                if (index >= led_min && index < led_max && index != NO_LED &&
+                keymap_key_to_keycode(layer, (keypos_t){col,row}) > KC_TRNS) {
+                    rgb_matrix_set_color(index, RGB_GREEN);
+                }
+            }
+        }
+    }
+
     return false;
 }
 
 void keyboard_post_init_user(void) {
-//    rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_REACTIVE_SIMPLE);
-//    rgb_matrix_sethsv_noeeprom(204, 255, 128);
-rgb_matrix_enable_noeeprom();
+    rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_REACTIVE);
+    // this sets the base color
+    rgb_matrix_sethsv_noeeprom(40, 100, 60);
+//    rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
+//    rgb_matrix_sethsv_noeeprom(HSV_GOLD);
 }
