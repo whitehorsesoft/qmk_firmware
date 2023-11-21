@@ -109,3 +109,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
     return true;
 }
+
+bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
+    if (host_keyboard_led_state().caps_lock) {
+                rgb_matrix_set_color(led_min, RGB_RED);
+    }
+    return false;
+}
+
+void keyboard_post_init_user(void) {
+//    rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_REACTIVE_SIMPLE);
+//    rgb_matrix_sethsv_noeeprom(204, 255, 128);
+rgb_matrix_enable_noeeprom();
+}
