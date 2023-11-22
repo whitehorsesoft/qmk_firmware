@@ -233,7 +233,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         // can't do this, because need to set the color back when done
 //        rgb_matrix_sethsv_noeeprom(0, 250, 128);
 
-        HSV red_hsv = {0, 255, 128}; // ref color.h
+        HSV red_hsv = {0, 255, 63}; // ref color.h
         RGB red_subdued_rgb = hsv_to_rgb(red_hsv);
 
         rgb_matrix_set_color_all(
@@ -241,15 +241,23 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
                 red_subdued_rgb.g,
                 red_subdued_rgb.b
                 );
+
 //                rgb_matrix_set_color(0, RGB_RED);
 //                rgb_matrix_set_color(1, RGB_GREEN);
 //        rgb_matrix_set_color(2, RGB_BLUE);
+
+//        rgb_matrix_mode_noeeprom(RGB_MATRIX_CYCLE_OUT_IN);
     }
+//    else {
+//        rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_REACTIVE);
+        // this sets the base color
+//        rgb_matrix_sethsv_noeeprom(40, 100, 60);
+//    }
 
     if (get_highest_layer(layer_state) > 0) {
         uint8_t layer = get_highest_layer(layer_state);
 
-        int hue = 360 / 6 * layer;
+        int hue = 360 / 5 * layer;
         HSV layer_hue = {hue, 255, 128};
         RGB layer_rgb = hsv_to_rgb(layer_hue);
 
