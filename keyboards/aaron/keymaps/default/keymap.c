@@ -4,9 +4,44 @@
 #include QMK_KEYBOARD_H
 
 enum custom_keycodes {
-    CKC_Y_ESC = SAFE_RANGE,
-    CKC_F_ESC
+    // first keycode should always be set to SAFE_RANGE (ref https://docs.qmk.fm/#/custom_quantum_functions?id=defining-a-new-keycode)
+    SS_GG = SAFE_RANGE,
+    SS_00,
+    SS_APPEND_SEMI,
+    SS_RDARW,
+    SS_LDARW,
+    SS_RSARW,
+    SS_APPEND,
 };
+
+struct prev_keypress_struct {
+    uint16_t keycode;
+    uint16_t pressed_time;
+};
+
+struct possibility {
+    uint16_t main_keycode;
+    uint16_t hold_keycode;
+};
+
+struct possibility possibilities[] = {
+        { .main_keycode = KC_COMMA, .hold_keycode = S(KC_SLASH) },
+        { .main_keycode = KC_DOT, .hold_keycode = KC_SEMICOLON },
+        { .main_keycode = KC_P, .hold_keycode = S(KC_QUOTE) },
+        { .main_keycode = KC_F, .hold_keycode = KC_ESC },
+        { .main_keycode = KC_Y, .hold_keycode = KC_ESC },
+        { .main_keycode = KC_A, .hold_keycode = KC_CAPS },
+        { .main_keycode = KC_0, .hold_keycode = SS_00 },
+        { .main_keycode = KC_G, .hold_keycode = KC_EQUAL },
+        { .main_keycode = KC_C, .hold_keycode = KC_MINUS },
+        { .main_keycode = KC_R, .hold_keycode = KC_BACKSLASH },
+        { .main_keycode = KC_S, .hold_keycode = S(KC_2) },
+        { .main_keycode = KC_M, .hold_keycode = KC_SLASH },
+        { .main_keycode = KC_W, .hold_keycode = S(KC_SEMICOLON) },
+        { .main_keycode = KC_V, .hold_keycode = S(KC_GRAVE) },
+};
+
+struct prev_keypress_struct prev_keypress;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // base
@@ -66,9 +101,9 @@ LGUI(KC_DOWN), KC_GRAVE, LT(3, KC_Q), LT(2, KC_J), LT(1, KC_K), KC_X, /**/ KC_B,
         // row 1
         KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, LSFT(KC_LBRC), LSFT(KC_RBRC), KC_TRANSPARENT, /**/ KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
         // row 2
-        KC_TRANSPARENT, KC_LBRC, KC_RBRC, LSFT(KC_9), LSFT(KC_0), KC_TRANSPARENT, /**/ KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+        KC_TRANSPARENT, KC_LBRC, KC_RBRC, LSFT(KC_9), LSFT(KC_0), SS_APPEND_SEMI, /**/ KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, LSFT(KC_2), KC_TRANSPARENT,
         // row 3
-        KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, LSFT(KC_COMMA), LSFT(KC_DOT), KC_TRANSPARENT, /**/ KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+        KC_TRANSPARENT, SS_LDARW, SS_RDARW, LSFT(KC_COMMA), LSFT(KC_DOT), KC_TRANSPARENT, /**/ KC_TRANSPARENT, KC_SLASH, LSFT(KC_SEMICOLON), LSFT(KC_GRAVE), KC_TRANSPARENT, KC_TRANSPARENT,
         // row 4 & some of thumb
         KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, /**/ KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
         // remainder of thumb
@@ -88,25 +123,108 @@ LGUI(KC_DOWN), KC_GRAVE, LT(3, KC_Q), LT(2, KC_J), LT(1, KC_K), KC_X, /**/ KC_B,
 //        KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, /**/ KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT)
 };
 
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        case CKC_F_ESC:
-            if (record->tap.count && record->event.pressed) {
-                tap_code16(KC_ESC); // Send on tap
-            }
-            else if (record->event.pressed) {
-                tap_code16(KC_F); // send on hold
-            }
-            return false;        // Return false to ignore further processing of key
-        case CKC_Y_ESC:
-            if (record->tap.count && record->event.pressed) {
-                tap_code16(KC_Y); // Send on tap
-            }
-            else if (record->event.pressed) {
-                tap_code16(KC_ESC); // send on hold
-            }
-            return false;        // Return false to ignore further processing of key
+uint16_t process_keypress(uint16_t keycode) {
+    if (get_mods() == MOD_MASK_SHIFT) {
+        keycode = S(keycode);
     }
+
+    if (get_mods() == MOD_MASK_ALT) {
+        keycode = A(keycode);
+    }
+
+    if (get_mods() == MOD_MASK_CTRL) {
+        keycode = C(keycode);
+    }
+
+    return keycode;
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    bool matched_possibility = false;
+    // check possibilities
+    for (int i = 0; i < 14; i++) {
+        if (possibilities[i].main_keycode == keycode) {
+            if (record->event.pressed) {
+                // pressed
+                prev_keypress.keycode = keycode;
+                prev_keypress.pressed_time = record->event.time;
+                return false;
+            } else {
+                // released
+                uint16_t now_time = record->event.time;
+                if ((now_time - prev_keypress.pressed_time) < 300) {
+                    keycode = process_keypress(possibilities[i].main_keycode);
+                } else {
+                    keycode = process_keypress(possibilities[i].hold_keycode);
+                }
+
+                matched_possibility = true;
+            }
+        }
+    }
+
+    switch (keycode) {
+        case SS_GG:
+            if (record->event.pressed) {
+                SEND_STRING("gg");
+            }
+            return false;
+            break;
+        case SS_00:
+            if (!record->event.pressed) {
+                SEND_STRING("00");
+            }
+            return false;
+            break;
+        case SS_APPEND_SEMI:
+            if (record->event.pressed) {
+                SEND_STRING_DELAY(SS_TAP(X_ESC) "A;" SS_TAP(X_ESC), 100);
+            }
+            return true;
+            break;
+        case SS_RDARW:
+            if (record->event.pressed) {
+                SEND_STRING_DELAY("=>", 100);
+            }
+            return true;
+            break;
+        case SS_LDARW:
+            if (record->event.pressed) {
+                SEND_STRING_DELAY("<=", 100);
+            }
+            return true;
+            break;
+        case SS_RSARW:
+            if (record->event.pressed) {
+                SEND_STRING_DELAY("->", 100);
+            }
+            return true;
+            break;
+        case SS_APPEND:
+            if (record->event.pressed) {
+                SEND_STRING_DELAY(SS_TAP(X_ESC) "A", 100);
+            }
+            return true;
+            break;
+            // tap dance hold
+//        case TD(TD_HOME):
+//        case TD(TD_END):
+//            action = &tap_dance_actions[TD_INDEX(keycode)];
+//            if (!record->event.pressed && action->state.count && !action->state.finished) {
+//                tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)action->user_data;
+//                tap_code16(tap_hold->tap);
+//            }
+//
+//            break;
+        default:
+            if (matched_possibility) {
+                tap_code16(keycode);
+                return false;
+            }
+
+            break;
+    }
+
     return true;
 }
 
