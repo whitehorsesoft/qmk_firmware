@@ -1,3 +1,7 @@
+Forked from https://github.com/qmk/qmk_firmware, merged with https://github.com/Cyboard-DigitalTailor/qmk_firmware/tree/cyboard_usb_c, merged with https://github.com/Cyboard-DigitalTailor/vial-qmk/tree/rigid-flex-matrix, with my custom layout and hold logic added.
+
+Work in progress, need to clean up and add better attribution.
+
 # aaron
 
 ![aaron](imgur.com image replace me!)
