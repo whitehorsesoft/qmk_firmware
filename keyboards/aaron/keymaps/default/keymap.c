@@ -38,6 +38,8 @@ struct possibility possibilities[] = {{.main_keycode = KC_COMMA, .hold_keycode =
         , {.main_keycode = KC_M, .hold_keycode = KC_SLASH}
         , {.main_keycode = KC_W, .hold_keycode = S(KC_SEMICOLON)}
         , {.main_keycode = KC_V, .hold_keycode = S(KC_GRAVE)}
+        , {.main_keycode = KC_HOME, .hold_keycode = LCTL(KC_HOME)}
+        , {.main_keycode = KC_END, .hold_keycode = LCTL(KC_END)}
         ,
 };
 
@@ -153,7 +155,7 @@ uint16_t process_keypress(uint16_t keycode) {
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     bool matched_possibility = false;
     // check possibilities
-    for (int i = 0; i < 14; i++) {
+    for (int i = 0; i < 16; i++) {
         if (possibilities[i].main_keycode == keycode) {
             if (record->event.pressed) {
                 // pressed
