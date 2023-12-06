@@ -27,6 +27,9 @@
       <option name="ALIGN_INIT_LIST_IN_COLUMNS" value="false" />
       <option name="ENUM_CONSTANTS_COMMA_ON_NEXT_LINE" value="true" />
     </Objective-C>
+    <clangFormatSettings>
+      <option name="ENABLED" value="true" />
+    </clangFormatSettings>
     <files>
       <extensions>
         <pair source="c" header="h" fileNamingConvention="NONE" />
